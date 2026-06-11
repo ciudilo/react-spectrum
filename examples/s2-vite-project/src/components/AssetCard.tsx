@@ -11,6 +11,7 @@
  */
 
 import {Asset, typeBadgeVariant, typeLabels} from '../data/assets';
+import {ColorHexCopy} from './ColorHexCopy';
 import {Badge, Card, CardPreview, Content, Image, Text} from '@react-spectrum/s2';
 import {style} from '@react-spectrum/s2/style' with {type: 'macro'};
 
@@ -39,16 +40,7 @@ export function AssetPreview({asset, aspectRatio = '3 / 2'}: AssetPreviewProps) 
         className={previewBox}
         style={{aspectRatio, backgroundColor: asset.hex}}
         data-testid="preview-color">
-        <span
-          style={{
-            fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-            fontSize: 16,
-            fontWeight: 600,
-            color: 'rgba(255, 255, 255, 0.92)',
-            letterSpacing: '0.04em'
-          }}>
-          {asset.hex.toUpperCase()}
-        </span>
+        <ColorHexCopy hex={asset.hex} />
       </div>
     );
   }

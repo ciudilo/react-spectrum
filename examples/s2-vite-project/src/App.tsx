@@ -25,7 +25,9 @@ import {
   PickerItem,
   Provider,
   SearchField,
-  Text
+  Text,
+  TextArea,
+  ToastContainer
 } from '@react-spectrum/s2';
 import '@react-spectrum/s2/page.css';
 import {Key, useMemo, useState} from 'react';
@@ -194,7 +196,14 @@ function App() {
         <DialogContainer onDismiss={() => setSelectedAsset(null)}>
           {selectedAsset && <AssetDetailDialog asset={selectedAsset} />}
         </DialogContainer>
+
+        <TextArea
+          label="Review comments"
+          aria-label="Review comments"
+          placeholder="Add review notes for brand assets"
+          styles={style({width: 'full', marginTop: 24})} />
       </div>
+      <ToastContainer />
     </Provider>
   );
 }
