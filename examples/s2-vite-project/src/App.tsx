@@ -25,9 +25,12 @@ import {
   PickerItem,
   Provider,
   SearchField,
-  Text
+  Text,
+  TextArea,
+  ToastContainer
 } from '@react-spectrum/s2';
 import '@react-spectrum/s2/page.css';
+import './demo-toast.css';
 import {Key, useMemo, useState} from 'react';
 import {style} from '@react-spectrum/s2/style' with {type: 'macro'};
 
@@ -194,7 +197,17 @@ function App() {
         <DialogContainer onDismiss={() => setSelectedAsset(null)}>
           {selectedAsset && <AssetDetailDialog asset={selectedAsset} />}
         </DialogContainer>
+
+        <Divider styles={style({marginY: 32})} />
+
+        <TextArea
+          label="Review comments"
+          aria-label="Review comments"
+          placeholder="Paste a copied hex value here to verify clipboard contents"
+          data-testid="review-comments"
+          styles={style({width: 'full', maxWidth: 640})} />
       </div>
+      <ToastContainer placement="bottom" />
     </Provider>
   );
 }

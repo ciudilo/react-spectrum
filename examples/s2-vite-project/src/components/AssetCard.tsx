@@ -11,7 +11,9 @@
  */
 
 import {Asset, typeBadgeVariant, typeLabels} from '../data/assets';
-import {Badge, Card, CardPreview, Content, Image, Text} from '@react-spectrum/s2';
+import {copyHexToClipboard} from '../utils/copyHex';
+import {ActionButton, Badge, Card, CardPreview, Content, Image, Text, Tooltip, TooltipTrigger} from '@react-spectrum/s2';
+import Copy from '@react-spectrum/s2/icons/Copy';
 import {style} from '@react-spectrum/s2/style' with {type: 'macro'};
 
 const previewBox = style({
@@ -34,21 +36,44 @@ interface AssetPreviewProps {
  */
 export function AssetPreview({asset, aspectRatio = '3 / 2'}: AssetPreviewProps) {
   if (asset.type === 'color') {
+    const hex = asset.hex.toUpperCase();
+
     return (
       <div
         className={previewBox}
         style={{aspectRatio, backgroundColor: asset.hex}}
         data-testid="preview-color">
-        <span
-          style={{
-            fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-            fontSize: 16,
-            fontWeight: 600,
-            color: 'rgba(255, 255, 255, 0.92)',
-            letterSpacing: '0.04em'
-          }}>
-          {asset.hex.toUpperCase()}
-        </span>
+        <div
+          className={style({
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8
+          })}>
+          <span
+            style={{
+              fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+              fontSize: 16,
+              fontWeight: 600,
+              color: 'rgba(255, 255, 255, 0.92)',
+              letterSpacing: '0.04em'
+            }}>
+            {hex}
+          </span>
+          <div onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()}>
+            <TooltipTrigger placement="top">
+              <ActionButton
+                aria-label={`Copy ${hex}`}
+                isQuiet
+                size="S"
+                staticColor="white"
+                data-testid="copy-hex-button"
+                onPress={() => copyHexToClipboard(hex)}>
+                <Copy />
+              </ActionButton>
+              <Tooltip>Copy hex</Tooltip>
+            </TooltipTrigger>
+          </div>
+        </div>
       </div>
     );
   }

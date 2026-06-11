@@ -1,0 +1,10 @@
+/*
+ * Demo-only styles: make copy-success toasts extra large and easy to see in recordings.
+ * ToastQueue forwards data attributes onto the toast value; we target them on the toast region.
+ */
+[role='alertdialog'] [slot='title'],
+[role='status'] [slot='title'] {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
