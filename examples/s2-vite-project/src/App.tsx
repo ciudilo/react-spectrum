@@ -25,7 +25,9 @@ import {
   PickerItem,
   Provider,
   SearchField,
-  Text
+  Text,
+  TextArea,
+  ToastContainer
 } from '@react-spectrum/s2';
 import '@react-spectrum/s2/page.css';
 import {Key, useMemo, useState} from 'react';
@@ -95,6 +97,7 @@ const cardViewStyles = style({
 function App() {
   let [query, setQuery] = useState('');
   let [filter, setFilter] = useState<Filter>('all');
+  let [reviewComments, setReviewComments] = useState('');
   let [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
 
   let counts = useMemo(() => {
@@ -194,7 +197,17 @@ function App() {
         <DialogContainer onDismiss={() => setSelectedAsset(null)}>
           {selectedAsset && <AssetDetailDialog asset={selectedAsset} />}
         </DialogContainer>
+
+        <TextArea
+          label="Review comments"
+          aria-label="Review comments"
+          placeholder="Paste copied color values here to verify clipboard contents"
+          value={reviewComments}
+          onChange={setReviewComments}
+          data-testid="review-comments"
+          styles={style({width: 'full', marginTop: 24})} />
       </div>
+      <ToastContainer placement="bottom" />
     </Provider>
   );
 }

@@ -12,6 +12,7 @@
 
 import {Asset, typeBadgeVariant, typeLabels} from '../data/assets';
 import {AssetPreview} from './AssetCard';
+import {ColorHexCopyButton} from './ColorHexCopyButton';
 import {
   Badge,
   Button,
@@ -110,7 +111,17 @@ export function AssetDetailDialog({asset}: AssetDetailDialogProps) {
             <>
               <div className={metaRow}>
                 <span className={metaLabel}>Hex</span>
-                <span className={metaValue} data-testid="meta-hex">{asset.hex.toUpperCase()}</span>
+                <span
+                  className={style({
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8
+                  })}>
+                  <span className={metaValue} data-testid="meta-hex">
+                    {asset.hex.toUpperCase()}
+                  </span>
+                  <ColorHexCopyButton hex={asset.hex} />
+                </span>
               </div>
               <div className={metaRow}>
                 <span className={metaLabel}>RGB</span>
