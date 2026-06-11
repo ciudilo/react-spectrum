@@ -25,8 +25,10 @@ import {
   PickerItem,
   Provider,
   SearchField,
-  Text
+  Text,
+  ToastContainer
 } from '@react-spectrum/s2';
+import './App.css';
 import '@react-spectrum/s2/page.css';
 import {Key, useMemo, useState} from 'react';
 import {style} from '@react-spectrum/s2/style' with {type: 'macro'};
@@ -195,6 +197,7 @@ function App() {
           {selectedAsset && <AssetDetailDialog asset={selectedAsset} />}
         </DialogContainer>
       </div>
+      <ToastContainer placement="bottom" data-brand-copy-toast-region />
     </Provider>
   );
 }
