@@ -59,7 +59,39 @@ If you are looking for place to start, consider the following options:
 ## Developing
 When you are ready to start developing you can clone the repo and start storybook.
 
-Make sure you have the following requirements installed: [node](https://nodejs.org/) (v24.14.1+) and [yarn](https://yarnpkg.com/en/) (v1.22.0+)
+### Required tools and prerequisites
+
+The tools below are everything needed to clone, build, run, verify, record, and submit changes. They are split into the **core development** tools you need to build and run the project, and the **agent / contribution workflow extras** needed for the full build → verify → record → PR loop (the same loop used to produce examples like the [Brand Asset Dashboard](examples/s2-vite-project)).
+
+macOS commands use [Homebrew](https://brew.sh/); Linux equivalents (Debian/Ubuntu `apt`) are noted where they differ.
+
+#### Core development
+
+| Tool | Version | What it's for | Install |
+| --- | --- | --- | --- |
+| [Node.js](https://nodejs.org/) | v24 (v24.14.1+) | JavaScript runtime used for all builds, tests, and dev servers. | `brew install node@24` &nbsp;·&nbsp; Linux: [nodesource](https://github.com/nodesource/distributions) or [`nvm`](https://github.com/nvm-sh/nvm) |
+| [Yarn](https://yarnpkg.com/) 4 | yarn@4.13.0 (pinned via `packageManager`) | Package manager and workspace tooling for the monorepo. | Enable [Corepack](https://nodejs.org/api/corepack.html) (ships with Node): `corepack enable` — the pinned version is then used automatically. |
+| [Git](https://git-scm.com/) | any recent | Version control; cloning, branching, and committing. | `brew install git` &nbsp;·&nbsp; Linux: `sudo apt install git` |
+| [Playwright](https://playwright.dev/) browsers | bundled | Browser engines used for browser-based verification and screen recording. The npm package is installed by `yarn install`; the browsers are a separate download. | `yarn playwright install` (or just `yarn playwright install chromium`) |
+
+> Note: Use **Node.js 24**. Other versions can cause `yarn build` / `yarn start` failures (see [Q & A](#q--a)). After changing Node versions, delete `node_modules` and re-run `yarn install`.
+
+#### Agent / contribution workflow extras
+
+These are needed for the complete end-to-end contribution loop — running a dev server, verifying it in a real browser, recording a demo GIF, and opening a pull request. They are commonly missing on a fresh machine and have to be installed separately.
+
+| Tool | What it's for | Install |
+| --- | --- | --- |
+| [Homebrew](https://brew.sh/) | The macOS package manager used to install the tools below. | See [brew.sh](https://brew.sh/). Not needed on Linux (use `apt`). |
+| [GitHub CLI (`gh`)](https://cli.github.com/) | Forking the repo and opening pull requests from the terminal. Run `gh auth login` once after installing. | `brew install gh` &nbsp;·&nbsp; Linux: `sudo apt install gh` ([docs](https://github.com/cli/cli/blob/trunk/docs/install_linux.md)) |
+| [ffmpeg](https://ffmpeg.org/) | Converting Playwright screen recordings into optimized GIFs for PRs and docs. | `brew install ffmpeg` &nbsp;·&nbsp; Linux: `sudo apt install ffmpeg` |
+
+On macOS the two `brew` packages can be installed in one step:
+```bash
+brew install gh ffmpeg
+```
+
+### Getting started
 
 Fork the repo first using [this guide](https://help.github.com/articles/fork-a-repo), then clone it locally.
 ```
