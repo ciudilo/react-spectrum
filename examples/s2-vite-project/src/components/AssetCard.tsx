@@ -11,7 +11,19 @@
  */
 
 import {Asset, typeBadgeVariant, typeLabels} from '../data/assets';
-import {Badge, Card, CardPreview, Content, Image, Text} from '@react-spectrum/s2';
+import {
+  ActionButton,
+  Badge,
+  Card,
+  CardPreview,
+  Content,
+  Image,
+  Text,
+  ToastQueue,
+  Tooltip,
+  TooltipTrigger
+} from '@react-spectrum/s2';
+import Copy from '@react-spectrum/s2/icons/Copy';
 import {style} from '@react-spectrum/s2/style' with {type: 'macro'};
 
 const previewBox = style({
@@ -32,23 +44,55 @@ interface AssetPreviewProps {
  * Renders an asset preview that varies by type: a color swatch, a logo/image, or a
  * typographic sample. Shared between the grid card and the detail dialog.
  */
+function copyHex(hex: string) {
+  navigator.clipboard
+    .writeText(hex)
+    .then(() => {
+      ToastQueue.positive(`Copied ${hex}`);
+    })
+    .catch(() => {
+      ToastQueue.negative('Failed to copy hex value.');
+    });
+}
+
 export function AssetPreview({asset, aspectRatio = '3 / 2'}: AssetPreviewProps) {
   if (asset.type === 'color') {
+    const hex = asset.hex.toUpperCase();
+
     return (
       <div
         className={previewBox}
         style={{aspectRatio, backgroundColor: asset.hex}}
         data-testid="preview-color">
-        <span
+        <div
           style={{
-            fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-            fontSize: 16,
-            fontWeight: 600,
-            color: 'rgba(255, 255, 255, 0.92)',
-            letterSpacing: '0.04em'
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4
           }}>
-          {asset.hex.toUpperCase()}
-        </span>
+          <span
+            style={{
+              fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+              fontSize: 16,
+              fontWeight: 600,
+              color: 'rgba(255, 255, 255, 0.92)',
+              letterSpacing: '0.04em'
+            }}>
+            {hex}
+          </span>
+          <TooltipTrigger>
+            <ActionButton
+              aria-label={`Copy ${hex}`}
+              data-testid="copy-hex-button"
+              isQuiet
+              size="S"
+              staticColor="white"
+              onPress={() => copyHex(hex)}>
+              <Copy />
+            </ActionButton>
+            <Tooltip>Copy hex</Tooltip>
+          </TooltipTrigger>
+        </div>
       </div>
     );
   }
