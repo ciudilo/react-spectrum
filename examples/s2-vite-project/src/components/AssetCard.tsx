@@ -11,7 +11,7 @@
  */
 
 import {Asset, typeBadgeVariant, typeLabels} from '../data/assets';
-import {Badge, Card, CardPreview, Content, Image, Text} from '@react-spectrum/s2';
+import {Badge, Button, Card, CardPreview, Content, Image, Text, ToastQueue} from '@react-spectrum/s2';
 import {style} from '@react-spectrum/s2/style' with {type: 'macro'};
 
 const previewBox = style({
@@ -22,10 +22,37 @@ const previewBox = style({
   overflow: 'hidden'
 });
 
+const colorValueRow = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  paddingX: 12,
+  paddingY: 8,
+  borderRadius: 'lg',
+  backgroundColor: 'transparent-black-500'
+});
+
 interface AssetPreviewProps {
   asset: Asset;
   /** The aspect ratio of the preview, expressed as a CSS aspect-ratio value. */
   aspectRatio?: string;
+}
+
+async function copyToClipboard(value: string) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+
+  let textArea = document.createElement('textarea');
+  textArea.value = value;
+  textArea.setAttribute('readonly', '');
+  textArea.style.position = 'fixed';
+  textArea.style.opacity = '0';
+  document.body.appendChild(textArea);
+  textArea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textArea);
 }
 
 /**
@@ -34,21 +61,37 @@ interface AssetPreviewProps {
  */
 export function AssetPreview({asset, aspectRatio = '3 / 2'}: AssetPreviewProps) {
   if (asset.type === 'color') {
+    let hex = asset.hex.toUpperCase();
+    let onCopyColor = async () => {
+      await copyToClipboard(hex);
+      ToastQueue.positive(`Copied ${hex}`, {timeout: 8000});
+    };
+
     return (
       <div
         className={previewBox}
         style={{aspectRatio, backgroundColor: asset.hex}}
         data-testid="preview-color">
-        <span
-          style={{
-            fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-            fontSize: 16,
-            fontWeight: 600,
-            color: 'rgba(255, 255, 255, 0.92)',
-            letterSpacing: '0.04em'
-          }}>
-          {asset.hex.toUpperCase()}
-        </span>
+        <div className={colorValueRow} onClick={e => e.stopPropagation()}>
+          <span
+            style={{
+              fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+              fontSize: 16,
+              fontWeight: 600,
+              color: 'rgba(255, 255, 255, 0.92)',
+              letterSpacing: '0.04em'
+            }}>
+            {hex}
+          </span>
+          <Button
+            size="S"
+            variant="secondary"
+            onPress={onCopyColor}
+            data-testid={`copy-color-${asset.id}`}
+            aria-label={`Copy ${hex}`}>
+            Copy
+          </Button>
+        </div>
       </div>
     );
   }
