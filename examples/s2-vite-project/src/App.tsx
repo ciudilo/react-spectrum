@@ -25,6 +25,7 @@ import {
   PickerItem,
   Provider,
   SearchField,
+  Switch,
   Text
 } from '@react-spectrum/s2';
 import '@react-spectrum/s2/page.css';
@@ -46,6 +47,15 @@ const page = style({
   marginX: 'auto',
   paddingX: 24,
   paddingY: 32
+});
+
+const headerRow = style({
+  display: 'flex',
+  flexWrap: 'wrap',
+  justifyContent: 'space-between',
+  alignItems: 'start',
+  gap: 16,
+  marginBottom: 8
 });
 
 const summaryRow = style({
@@ -93,6 +103,7 @@ const cardViewStyles = style({
 });
 
 function App() {
+  let [isDarkMode, setIsDarkMode] = useState(false);
   let [query, setQuery] = useState('');
   let [filter, setFilter] = useState<Filter>('all');
   let [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
@@ -128,14 +139,24 @@ function App() {
   };
 
   return (
-    <Provider elementType="main">
+    <Provider elementType="main" colorScheme={isDarkMode ? 'dark' : 'light'}>
       <div className={page}>
-        <Heading level={1} styles={style({font: 'heading-xl', marginY: 0})}>
-          Brand Asset Dashboard
-        </Heading>
-        <Text styles={style({font: 'body-lg', color: 'gray-600'})}>
-          Browse, search, and inspect the building blocks of the brand system.
-        </Text>
+        <div className={headerRow}>
+          <div>
+            <Heading level={1} styles={style({font: 'heading-xl', marginY: 0})}>
+              Brand Asset Dashboard
+            </Heading>
+            <Text styles={style({font: 'body-lg', color: 'gray-600'})}>
+              Browse, search, and inspect the building blocks of the brand system.
+            </Text>
+          </div>
+          <Switch
+            isSelected={isDarkMode}
+            onChange={setIsDarkMode}
+            data-testid="dark-mode-switch">
+            Dark mode
+          </Switch>
+        </div>
 
         <div className={summaryRow} data-testid="summary-row">
           <div className={statCard}>
