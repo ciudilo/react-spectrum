@@ -11,6 +11,7 @@
  */
 
 import {Asset, typeBadgeVariant, typeLabels} from '../data/assets';
+import {HexCopyButton} from './HexCopyButton';
 import {Badge, Card, CardPreview, Content, Image, Text} from '@react-spectrum/s2';
 import {style} from '@react-spectrum/s2/style' with {type: 'macro'};
 
@@ -41,13 +42,17 @@ export function AssetPreview({asset, aspectRatio = '3 / 2'}: AssetPreviewProps) 
         data-testid="preview-color">
         <span
           style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
             fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
             fontSize: 16,
             fontWeight: 600,
             color: 'rgba(255, 255, 255, 0.92)',
             letterSpacing: '0.04em'
           }}>
-          {asset.hex.toUpperCase()}
+          <span data-testid="swatch-hex">{asset.hex.toUpperCase()}</span>
+          <HexCopyButton hex={asset.hex} isQuiet />
         </span>
       </div>
     );

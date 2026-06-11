@@ -25,7 +25,9 @@ import {
   PickerItem,
   Provider,
   SearchField,
-  Text
+  Text,
+  TextArea,
+  ToastContainer
 } from '@react-spectrum/s2';
 import '@react-spectrum/s2/page.css';
 import {Key, useMemo, useState} from 'react';
@@ -96,6 +98,7 @@ function App() {
   let [query, setQuery] = useState('');
   let [filter, setFilter] = useState<Filter>('all');
   let [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  let [reviewComments, setReviewComments] = useState('');
 
   let counts = useMemo(() => {
     let base: Record<AssetType, number> = {logo: 0, color: 0, font: 0, image: 0};
@@ -194,7 +197,19 @@ function App() {
         <DialogContainer onDismiss={() => setSelectedAsset(null)}>
           {selectedAsset && <AssetDetailDialog asset={selectedAsset} />}
         </DialogContainer>
+
+        <Divider styles={style({marginY: 24})} />
+
+        <TextArea
+          label="Review comments"
+          aria-label="Review comments"
+          placeholder="Paste a copied hex value here to verify clipboard contents"
+          value={reviewComments}
+          onChange={setReviewComments}
+          data-testid="review-comments"
+          styles={style({width: 'full', maxWidth: 640})} />
       </div>
+      <ToastContainer />
     </Provider>
   );
 }

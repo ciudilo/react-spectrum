@@ -12,6 +12,7 @@
 
 import {Asset, typeBadgeVariant, typeLabels} from '../data/assets';
 import {AssetPreview} from './AssetCard';
+import {HexCopyButton} from './HexCopyButton';
 import {
   Badge,
   Button,
@@ -21,10 +22,10 @@ import {
   Header,
   Heading,
   Text,
+  ToastQueue,
   useDialogContainer
 } from '@react-spectrum/s2';
 import {style} from '@react-spectrum/s2/style' with {type: 'macro'};
-import {useState} from 'react';
 
 const previewWrapper = style({
   width: 'full',
@@ -80,16 +81,19 @@ interface AssetDetailDialogProps {
  */
 export function AssetDetailDialog({asset}: AssetDetailDialogProps) {
   let dialog = useDialogContainer();
-  let [copied, setCopied] = useState(false);
   let {label: copyLabel, value} = copyValue(asset);
 
-  let onCopy = async () => {
-    try {
-      await navigator.clipboard?.writeText(value);
-    } catch {
-      // Clipboard may be unavailable; still surface success feedback below.
-    }
-    setCopied(true);
+  let onCopy = () => {
+    navigator.clipboard
+      .writeText(value)
+      .then(() => {
+        let message =
+          asset.type === 'color' ? `Copied ${value.toUpperCase()}` : `Copied ${copyLabel} to clipboard!`;
+        ToastQueue.positive(message);
+      })
+      .catch(() => {
+        ToastQueue.negative('Failed to copy.');
+      });
   };
 
   return (
@@ -110,7 +114,12 @@ export function AssetDetailDialog({asset}: AssetDetailDialogProps) {
             <>
               <div className={metaRow}>
                 <span className={metaLabel}>Hex</span>
-                <span className={metaValue} data-testid="meta-hex">{asset.hex.toUpperCase()}</span>
+                <span
+                  className={style({display: 'flex', alignItems: 'center', gap: 8})}
+                  data-testid="meta-hex">
+                  <span className={metaValue}>{asset.hex.toUpperCase()}</span>
+                  <HexCopyButton hex={asset.hex} />
+                </span>
               </div>
               <div className={metaRow}>
                 <span className={metaLabel}>RGB</span>
@@ -140,16 +149,7 @@ export function AssetDetailDialog({asset}: AssetDetailDialogProps) {
             </Badge>
           ))}
         </div>
-        {copied && (
-          <div className={style({marginTop: 16})}>
-            <Text>
-              <span data-testid="copy-feedback" style={{color: '#15803d', fontWeight: 600}}>
-                Copied {copyLabel} to clipboard!
-              </span>
-            </Text>
-          </div>
-        )}
-      </Content>
+        </Content>
       <ButtonGroup>
         <Button variant="secondary" onPress={() => dialog.dismiss()}>
           Close
