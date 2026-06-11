@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Adobe. All rights reserved.
+ * Copyright 2026 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -10,350 +10,190 @@
  * governing permissions and limitations under the License.
  */
 
-import React, {useState} from 'react';
-import '@react-spectrum/s2/page.css';
+import {Asset, assets, AssetType, typeLabels} from './data/assets';
+import {AssetCard} from './components/AssetCard';
+import {AssetDetailDialog} from './components/AssetDetailDialog';
 import {
-  ActionButton,
-  ActionButtonGroup,
-  ActionMenu,
-  Button,
-  ButtonGroup,
-  Cell,
+  CardView,
   Collection,
-  Column,
+  Content,
+  DialogContainer,
   Divider,
   Heading,
-  LinkButton,
-  ListView,
-  ListViewItem,
-  Menu,
-  MenuItem,
-  MenuTrigger,
-  NotificationBadge,
+  IllustratedMessage,
   Picker,
   PickerItem,
   Provider,
-  Row,
-  SubmenuTrigger,
-  TableBody,
-  TableHeader,
-  TableView,
-  Text,
-  ToggleButton,
-  ToggleButtonGroup,
-  TreeView,
-  TreeViewItem,
-  TreeViewItemContent,
-  useDragAndDrop,
-  useListData,
-  useTreeData
+  SearchField,
+  Text
 } from '@react-spectrum/s2';
-import Edit from '@react-spectrum/s2/icons/Edit';
-import FileTxt from '@react-spectrum/s2/icons/FileText';
-import Folder from '@react-spectrum/s2/icons/Folder';
-import Section from './components/Section';
+import '@react-spectrum/s2/page.css';
+import {Key, useMemo, useState} from 'react';
 import {style} from '@react-spectrum/s2/style' with {type: 'macro'};
-import {CardViewExample} from './components/CardViewExample';
-import {CollectionCardsExample} from './components/CollectionCardsExample';
 
-const Lazy = React.lazy(() => import('./Lazy'));
+type Filter = AssetType | 'all';
 
-type TreeItemData = {id: string; name: string; childItems?: TreeItemData[]};
-
-let listItems = [
-  {id: 'photoshop', name: 'Adobe Photoshop'},
-  {id: 'xd', name: 'Adobe XD'},
-  {id: 'indesign', name: 'Adobe InDesign'},
-  {id: 'premiere', name: 'Adobe Premiere'},
-  {id: 'aftereffects', name: 'Adobe After Effects'}
+const filterOptions: {id: Filter; label: string}[] = [
+  {id: 'all', label: 'All assets'},
+  {id: 'logo', label: 'Logos'},
+  {id: 'color', label: 'Colors'},
+  {id: 'font', label: 'Fonts'},
+  {id: 'image', label: 'Images'}
 ];
 
-let tableItems = [
-  {id: '1', name: 'Games', type: 'File folder', modified: '6/7/2020'},
-  {id: '2', name: 'Program Files', type: 'File folder', modified: '4/7/2021'},
-  {id: '3', name: 'bootmgr', type: 'System file', modified: '11/20/2010'},
-  {id: '4', name: 'log.txt', type: 'Text document', modified: '1/2/2022'},
-  {id: '5', name: 'readme.md', type: 'Text document', modified: '3/15/2023'}
-];
+const page = style({
+  maxWidth: 1100,
+  marginX: 'auto',
+  paddingX: 24,
+  paddingY: 32
+});
 
-let treeItems: TreeItemData[] = [
-  {id: 'photos', name: 'Photos'},
-  {
-    id: 'projects',
-    name: 'Projects',
-    childItems: [
-      {
-        id: 'projects-1',
-        name: 'Projects-1',
-        childItems: [{id: 'projects-1A', name: 'Projects-1A'}]
-      },
-      {id: 'projects-2', name: 'Projects-2'},
-      {id: 'projects-3', name: 'Projects-3'}
-    ]
-  }
-];
+const summaryRow = style({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 12,
+  marginY: 24
+});
 
-function ReorderableListView() {
-  let list = useListData({initialItems: listItems});
-  let {dragAndDropHooks} = useDragAndDrop({
-    getItems: keys =>
-      [...keys].map(key => {
-        let item = list.getItem(key)!;
-        return {'text/plain': item.name};
-      }),
-    onReorder(e) {
-      if (e.target.dropPosition === 'before') {
-        list.moveBefore(e.target.key, e.keys);
-      } else if (e.target.dropPosition === 'after') {
-        list.moveAfter(e.target.key, e.keys);
-      }
-    }
-  });
-  return (
-    <ListView
-      aria-label="Reorderable files"
-      selectionMode="multiple"
-      items={list.items}
-      dragAndDropHooks={dragAndDropHooks}
-      styles={style({width: 320, height: 320})}>
-      {(item: any) => (
-        <ListViewItem textValue={item.name}>
-          <Text>{item.name}</Text>
-        </ListViewItem>
-      )}
-    </ListView>
-  );
-}
+const statCard = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 4,
+  paddingX: 20,
+  paddingY: 16,
+  borderRadius: 'lg',
+  backgroundColor: 'layer-1',
+  boxShadow: 'emphasized',
+  minWidth: 120,
+  flexGrow: 1
+});
 
-function ReorderableTableView() {
-  let list = useListData({initialItems: tableItems});
-  let {dragAndDropHooks} = useDragAndDrop({
-    getItems: keys =>
-      [...keys].map(key => {
-        let item = list.getItem(key)!;
-        return {'text/plain': item.name};
-      }),
-    onReorder(e) {
-      if (e.target.dropPosition === 'before') {
-        list.moveBefore(e.target.key, e.keys);
-      } else if (e.target.dropPosition === 'after') {
-        list.moveAfter(e.target.key, e.keys);
-      }
-    }
-  });
-  return (
-    <TableView
-      aria-label="Reorderable files"
-      selectionMode="multiple"
-      dragAndDropHooks={dragAndDropHooks}
-      styles={style({width: 320, height: 320})}>
-      <TableHeader>
-        <Column isRowHeader>Name</Column>
-        <Column>Type</Column>
-        <Column>Date Modified</Column>
-      </TableHeader>
-      <TableBody items={list.items}>
-        {(item: any) => (
-          <Row id={item.id}>
-            <Cell>{item.name}</Cell>
-            <Cell>{item.type}</Cell>
-            <Cell>{item.modified}</Cell>
-          </Row>
-        )}
-      </TableBody>
-    </TableView>
-  );
-}
+const statValue = style({
+  font: 'heading',
+  color: 'gray-900'
+});
 
-function TreeItem({id, name, childItems}: TreeItemData) {
-  return (
-    <TreeViewItem id={id} textValue={name}>
-      <TreeViewItemContent>
-        <Text>{name}</Text>
-        {childItems?.length ? <Folder /> : <FileTxt />}
-      </TreeViewItemContent>
-      {childItems && childItems.length > 0 && (
-        <Collection items={childItems}>{(item: TreeItemData) => <TreeItem {...item} />}</Collection>
-      )}
-    </TreeViewItem>
-  );
-}
+const statLabel = style({
+  font: 'ui-sm',
+  color: 'gray-600'
+});
 
-function ReorderableTreeView() {
-  let treeData = useTreeData<TreeItemData>({
-    initialItems: treeItems,
-    getKey: item => item.id,
-    getChildren: item => item.childItems ?? []
-  });
-  let processItem = (node: any): TreeItemData => ({
-    ...node.value,
-    id: node.key as string,
-    childItems: node.children ? [...node.children].map(processItem) : undefined
-  });
-  let items = treeData.items.map(processItem);
-  let {dragAndDropHooks} = useDragAndDrop({
-    getItems: keys =>
-      [...keys].map(key => {
-        let item = treeData.getItem(key)!;
-        return {'text/plain': item.value.name};
-      }),
-    getAllowedDropOperations: () => ['move'],
-    onMove(e) {
-      if (e.target.dropPosition === 'before') {
-        treeData.moveBefore(e.target.key, e.keys);
-      } else if (e.target.dropPosition === 'after') {
-        treeData.moveAfter(e.target.key, e.keys);
-      }
-    }
-  });
-  return (
-    <TreeView
-      aria-label="Reorderable tree"
-      items={items}
-      dragAndDropHooks={dragAndDropHooks}
-      styles={style({width: 320, height: 320})}>
-      {(item: TreeItemData) => <TreeItem {...item} />}
-    </TreeView>
-  );
-}
+const controlsRow = style({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 16,
+  alignItems: 'end',
+  marginBottom: 8
+});
+
+const cardViewStyles = style({
+  width: 'full',
+  height: 620,
+  marginTop: 16
+});
 
 function App() {
-  let [isLazyLoaded, setLazyLoaded] = useState(false);
-  let [cardViewState, setCardViewState] = useState({
-    layout: 'grid',
-    loadingState: 'idle'
-  });
-  let cardViewLoadingOptions = [
-    {id: 'idle', label: 'Idle'},
-    {id: 'loading', label: 'Loading'},
-    {id: 'sorting', label: 'Sorting'},
-    {id: 'loadingMore', label: 'Loading More'},
-    {id: 'error', label: 'Error'}
-  ];
-  let cardViewLayoutOptions = [
-    {id: 'grid', label: 'Grid'},
-    {id: 'waterfall', label: 'Waterfall'}
-  ];
+  let [query, setQuery] = useState('');
+  let [filter, setFilter] = useState<Filter>('all');
+  let [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+
+  let counts = useMemo(() => {
+    let base: Record<AssetType, number> = {logo: 0, color: 0, font: 0, image: 0};
+    for (let asset of assets) {
+      base[asset.type]++;
+    }
+    return base;
+  }, []);
+
+  let filtered = useMemo(() => {
+    let q = query.trim().toLowerCase();
+    return assets.filter(asset => {
+      let matchesType = filter === 'all' || asset.type === filter;
+      if (!matchesType) {
+        return false;
+      }
+      if (!q) {
+        return true;
+      }
+      let haystack = [asset.name, asset.description, ...asset.tags].join(' ').toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [query, filter]);
+
+  let onCardAction = (key: Key) => {
+    let asset = assets.find(a => a.id === key);
+    if (asset) {
+      setSelectedAsset(asset);
+    }
+  };
+
   return (
     <Provider elementType="main">
-      <Heading styles={style({font: 'heading-xl', textAlign: 'center'})} level={1}>
-        Spectrum 2 + Vite
-      </Heading>
-      <div
-        className={style({
-          maxWidth: 288,
-          margin: 'auto'
-        })}>
-        <Divider />
-      </div>
-      <div
-        className={style({
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 16,
-          alignItems: 'center'
-        })}>
-        <Section title="Buttons">
-          <ButtonGroup align="center" styles={style({maxWidth: '[100vw]'})}>
-            <Button variant="primary">Primary</Button>
-            <Button variant="secondary">
-              <Text>Secondary</Text>
-            </Button>
-            <ActionButton>
-              <Edit />
-              <Text>Action Button</Text>
-              <NotificationBadge value={2} />
-            </ActionButton>
-            <ToggleButton>Toggle Button</ToggleButton>
-            <LinkButton variant="primary" href="https://adobe.com" target="_blank">
-              Link Button
-            </LinkButton>
-            <ActionButtonGroup density="compact">
-              <ActionButton>Cut</ActionButton>
-              <ActionButton>Copy</ActionButton>
-              <ActionButton>Paste</ActionButton>
-            </ActionButtonGroup>
-            <ToggleButtonGroup density="compact" selectionMode="multiple">
-              <ToggleButton id="bold">Bold</ToggleButton>
-              <ToggleButton id="italic">Italic</ToggleButton>
-              <ToggleButton id="underline">Underline</ToggleButton>
-            </ToggleButtonGroup>
-          </ButtonGroup>
-        </Section>
+      <div className={page}>
+        <Heading level={1} styles={style({font: 'heading-xl', marginY: 0})}>
+          Brand Asset Dashboard
+        </Heading>
+        <Text styles={style({font: 'body-lg', color: 'gray-600'})}>
+          Browse, search, and inspect the building blocks of the brand system.
+        </Text>
 
-        <Section title="Collections">
-          <ActionMenu>
-            <MenuItem>Action Menu Item 1</MenuItem>
-            <MenuItem>Action Menu Item 2</MenuItem>
-            <MenuItem>Action Menu Item 3</MenuItem>
-          </ActionMenu>
+        <div className={summaryRow} data-testid="summary-row">
+          <div className={statCard}>
+            <span className={statValue}>{assets.length}</span>
+            <span className={statLabel}>Total assets</span>
+          </div>
+          {(Object.keys(counts) as AssetType[]).map(type => (
+            <div key={type} className={statCard}>
+              <span className={statValue}>{counts[type]}</span>
+              <span className={statLabel}>{typeLabels[type]}s</span>
+            </div>
+          ))}
+        </div>
+
+        <Divider styles={style({marginY: 16})} />
+
+        <div className={controlsRow}>
+          <SearchField
+            aria-label="Search assets"
+            label="Search"
+            placeholder="Search by name or tag"
+            value={query}
+            onChange={setQuery}
+            styles={style({width: 320, maxWidth: 'full'})} />
           <Picker
-            label="CardView Loading State"
-            items={cardViewLoadingOptions}
-            selectedKey={cardViewState.loadingState}
-            onSelectionChange={loadingState =>
-              setCardViewState({...cardViewState, loadingState: loadingState as string})
-            }>
+            label="Type"
+            aria-label="Filter by type"
+            items={filterOptions}
+            selectedKey={filter}
+            onSelectionChange={key => setFilter(key as Filter)}
+            styles={style({width: 220})}>
             {item => <PickerItem id={item.id}>{item.label}</PickerItem>}
           </Picker>
-          <Picker
-            label="CardView Layout"
-            items={cardViewLayoutOptions}
-            selectedKey={cardViewState.layout}
-            onSelectionChange={layout =>
-              setCardViewState({...cardViewState, layout: layout as string})
-            }>
-            {item => <PickerItem id={item.id}>{item.label}</PickerItem>}
-          </Picker>
-          <CardViewExample {...cardViewState} />
-          <Divider styles={style({maxWidth: 320, marginX: 'auto'})} />
-          <CollectionCardsExample loadingState={cardViewState.loadingState} />
-          <MenuTrigger>
-            <ActionButton>Menu</ActionButton>
-            <Menu onAction={key => alert(key.toString())}>
-              <MenuItem id="cut">Cut</MenuItem>
-              <MenuItem id="copy">Copy</MenuItem>
-              <MenuItem id="paste">Paste</MenuItem>
-              <MenuItem id="replace">Replace</MenuItem>
-              <SubmenuTrigger>
-                <MenuItem id="share">Share</MenuItem>
-                <Menu onAction={key => alert(key.toString())}>
-                  <MenuItem id="copy-ink">Copy Link</MenuItem>
-                  <SubmenuTrigger>
-                    <MenuItem id="email">Email</MenuItem>
-                    <Menu onAction={key => alert(key.toString())}>
-                      <MenuItem id="attachment">Email as Attachment</MenuItem>
-                      <MenuItem id="link">Email as Link</MenuItem>
-                    </Menu>
-                  </SubmenuTrigger>
-                  <MenuItem id="sms">SMS</MenuItem>
-                </Menu>
-              </SubmenuTrigger>
-              <MenuItem id="delete">Delete</MenuItem>
-            </Menu>
-          </MenuTrigger>
-          <MenuTrigger>
-            <ActionButton>Menu Trigger</ActionButton>
-            <Menu>
-              <MenuItem href="/foo">Link to /foo</MenuItem>
-              <MenuItem>Cut</MenuItem>
-              <MenuItem>Copy</MenuItem>
-              <MenuItem>Paste</MenuItem>
-            </Menu>
-          </MenuTrigger>
-          <ReorderableListView />
-          <ReorderableTableView />
-          <ReorderableTreeView />
-        </Section>
+          <Text styles={style({font: 'ui-sm', color: 'gray-600', marginBottom: 8})}>
+            <span data-testid="result-count">{filtered.length}</span> result
+            {filtered.length === 1 ? '' : 's'}
+          </Text>
+        </div>
 
-        {!isLazyLoaded && (
-          <ActionButton onPress={() => setLazyLoaded(true)}>Load more</ActionButton>
-        )}
-        {isLazyLoaded && (
-          <React.Suspense fallback={<>Loading</>}>
-            <Lazy />
-          </React.Suspense>
-        )}
+        <CardView
+          aria-label="Brand assets"
+          onAction={onCardAction}
+          selectionMode="none"
+          styles={cardViewStyles}
+          renderEmptyState={() => (
+            <IllustratedMessage>
+              <Heading>No assets found</Heading>
+              <Content>Try a different search term or asset type.</Content>
+            </IllustratedMessage>
+          )}>
+          <Collection items={filtered}>
+            {(asset: Asset) => <AssetCard asset={asset} />}
+          </Collection>
+        </CardView>
+
+        <DialogContainer onDismiss={() => setSelectedAsset(null)}>
+          {selectedAsset && <AssetDetailDialog asset={selectedAsset} />}
+        </DialogContainer>
       </div>
     </Provider>
   );
