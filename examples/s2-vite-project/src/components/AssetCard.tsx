@@ -56,8 +56,10 @@ async function copyToClipboard(value: string) {
 }
 
 function showColorCopiedToast(hex: string) {
-  let region = document.querySelector<HTMLElement>('[data-brand-copy-toast-region]');
-  region?.style.setProperty('--brand-copied-color', hex);
+  // Set the variable on the document root so it inherits into the portaled toast.
+  // React owns the toast region element and wipes inline styles on re-render, so
+  // setting it there is unreliable.
+  document.documentElement.style.setProperty('--brand-copied-color', hex);
   ToastQueue.positive(hex, {timeout: 8000});
 }
 

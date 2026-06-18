@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
-[data-brand-copy-toast-region] {
+:root {
   --brand-copied-color: #22c55e;
 }
 
@@ -19,6 +19,7 @@
   position: relative !important;
   min-width: 420px !important;
   max-width: min(560px, 92vw) !important;
+  margin-bottom: 40px !important;
   padding: 22px 28px 22px 88px !important;
   border-radius: 18px !important;
   font-size: 30px !important;
