@@ -55,6 +55,12 @@ async function copyToClipboard(value: string) {
   document.body.removeChild(textArea);
 }
 
+function showColorCopiedToast(hex: string) {
+  let region = document.querySelector<HTMLElement>('[data-brand-copy-toast-region]');
+  region?.style.setProperty('--brand-copied-color', hex);
+  ToastQueue.positive(hex, {timeout: 8000});
+}
+
 /**
  * Renders an asset preview that varies by type: a color swatch, a logo/image, or a
  * typographic sample. Shared between the grid card and the detail dialog.
@@ -64,7 +70,7 @@ export function AssetPreview({asset, aspectRatio = '3 / 2'}: AssetPreviewProps) 
     let hex = asset.hex.toUpperCase();
     let onCopyColor = async () => {
       await copyToClipboard(hex);
-      ToastQueue.positive(`Copied ${hex}`, {timeout: 8000});
+      showColorCopiedToast(hex);
     };
 
     return (
